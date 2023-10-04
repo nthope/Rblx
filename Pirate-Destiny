@@ -1,0 +1,59 @@
+local remothPath = game:GetService("ReplicatedStorage").RemoteEvents.FishBuyEvent
+local FishAmount = 1
+
+getgenv().aFish = false
+getgenv().SellFish = false
+
+function doFish()
+    spawn(function()
+        while getgenv().aFish == true do
+            game:GetService("ReplicatedStorage").RemoteFunctions.FishFunction:InvokeServer("FishingSucceeded")
+            wait()
+        end
+    end)
+end
+
+function doSell()
+    spawn(function()
+        while getgenv().SellFish == true do
+            remothPath:FireServer("Sell", tostring(FishAmount), "Trout", FishAmount)
+            remothPath:FireServer("Sell", tostring(FishAmount), "Salmon", FishAmount)
+            remothPath:FireServer("Sell", tostring(FishAmount), "Large Trout", FishAmount)
+            remothPath:FireServer("Sell", tostring(FishAmount), "Large Salmon", FishAmount)
+            wait(1)
+        end
+    end)
+end
+
+local library = loadstring(game:HttpGet(('https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wall%20v3')))() -- let it be
+local w = library:CreateWindow("Pirate's Bounty by nt") -- Creates the window/main menu
+local b = w:CreateFolder("Auto") -- Ref no.1 and ref no.2 can be put under this folder
+
+b:DestroyGui()
+
+b:Toggle("Fish farm", function(bool)
+    getgenv().aFish = bool
+    print('Auto Fish: ', bool)
+    if bool then
+        doFish()
+    end
+end)
+
+b:Toggle("Auto sell fish", function(bool)
+    getgenv().SellFish = bool
+    print('Auto sell fish: ', bool)
+    if bool then
+        doSell()
+    end
+end)
+
+-- Add a slider for FishAmount without decimals
+b:Slider("Fish Amount", {
+    min = 1, -- min value of the slider
+    max = 30, -- max value of the slider
+    default = 1, -- default value (1 in this case)
+    precise = false, -- allow decimals
+}, function(value)
+    FishAmount = math.floor(value + 0.5) -- Round the value and update FishAmount
+    print("Fish Amount: ", FishAmount)
+end)
